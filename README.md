@@ -15,3 +15,5 @@ TODO: Add install prompt
 Yabai
 TODO: Add install prompt
 
+zsh
+TODO: Install prompt
