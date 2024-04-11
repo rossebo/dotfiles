@@ -16,4 +16,3 @@ TODO: Add install prompt
 
 zsh
 TODO: Install prompt
-
