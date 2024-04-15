@@ -113,9 +113,6 @@ eval "$(starship init zsh)"
 
 export PATH="$PATH:$HOME/.dotnet/tools/"
 export PATH="$PATH:$HOME/Scripts/"
-export GPT_TOKEN="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"
-
-#alias ask='ask.sh'
 
 export NVM_DIR="$HOME/.nvm"
   [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
