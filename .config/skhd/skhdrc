@@ -1,5 +1,5 @@
 # open iTerm
-ctrl + alt + cmd - return : open -n -a iTerm
+ctrl + alt + cmd - return : open -n -a kitty
 
 # focus window
 ctrl + alt + cmd - h : yabai -m window --focus west
