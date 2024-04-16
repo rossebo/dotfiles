@@ -43,9 +43,9 @@ yabai -m space 9 --label IX
 yabai -m space 10 --label X
 
 # yabai -m rule --add app="Google Chrome" space=1
-yabai -m rule --add app="Iterm2"     space=1
+yabai -m rule --add app="kitty"     space=1
 # ^^ these are annoying
-yabai -m rule --add app="Firefox"        space=2
+yabai -m rule --add app="Firefox"        space=3
 yabai -m rule --add app="Spotify"       space=6
 yabai -m rule --add app="Visual Studio Code"       space=3
 yabai -m rule --add app="Rider"       space=4
