@@ -3,9 +3,9 @@
 export WHITE=0xffffffff
 
 # -- Teal Scheme --
-export BAR_COLOR=0xff001f30
-export ITEM_BG_COLOR=0xff003547
-export ACCENT_COLOR=0xff2cf9ed
+#export BAR_COLOR=0xff001f30
+#export ITEM_BG_COLOR=0xff003547
+#export ACCENT_COLOR=0xff2cf9ed
 
 # -- Gray Scheme --
 # export BAR_COLOR=0xff101314
@@ -42,3 +42,11 @@ export ACCENT_COLOR=0xff2cf9ed
 # export BAR_COLOR=0xff2d2b02
 # export ITEM_BG_COLOR=0xff8e7e0a
 # export ACCENT_COLOR=0xfff7fc17
+
+
+# -- Monokai Pro Octagon ish --
+export BAR_COLOR=0xff3a3d4b
+export ITEM_BG_COLOR=0xff282a3a
+export ACCENT_COLOR=0xffff9b5e
+
+
