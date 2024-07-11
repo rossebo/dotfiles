@@ -184,3 +184,5 @@ alias ls="eza --color=always --long --git --no-filesize --icons=always --no-time
 eval "$(zoxide init zsh)"
 
 alias cd="z"
+
+export PATH=$PATH:$(go env GOPATH)/bin
