@@ -107,7 +107,6 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 #
-alias vim="nvim"
 eval "$(starship init zsh)"
 
 
@@ -184,5 +183,7 @@ alias ls="eza --color=always --long --git --no-filesize --icons=always --no-time
 eval "$(zoxide init zsh)"
 
 alias cd="z"
+alias vim="nvim"
 
 export PATH=$PATH:$(go env GOPATH)/bin
+
