@@ -26,3 +26,26 @@ vim.api.nvim_create_autocmd({ 'BufWritePre' }, {
     }
   end,
 })
+
+-- Workaround for setting virtual buffers to type nofile, so we aren't prompted to save changes to them
+-- This is handled by listing and iterating through them one second after startup because the __virtual.cs file is created later as a hidden buffer by the lsp
+-- and cannot be captured by 'BufEnter', 'BufHidden', 'BufNewFile', 'BufRead', 'BufReadPost' or 'BufWinEnter' events
+vim.api.nvim_create_autocmd('BufWinEnter', {
+  group = vim.api.nvim_create_augroup('rzls-virtual-buffers', { clear = true }),
+  callback = function(event)
+    vim.defer_fn(function()
+      for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+        local name = vim.api.nvim_buf_get_name(buf)
+        if name:match 'razor' then
+          local razor = require 'rzls.razor'
+          if name:match(razor.virtual_suffixes.csharp .. '$') or name:match(razor.virtual_suffixes.html .. '$') then
+            vim.api.nvim_set_option_value('buftype', 'nofile', { buf = buf })
+            vim.api.nvim_set_option_value('buflisted', false, { buf = buf })
+            vim.api.nvim_set_option_value('swapfile', false, { buf = buf })
+            vim.api.nvim_set_option_value('readonly', true, { buf = buf })
+          end
+        end
+      end
+    end, 1000)
+  end,
+})

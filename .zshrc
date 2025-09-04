@@ -185,5 +185,7 @@ eval "$(zoxide init zsh)"
 alias cd="z"
 alias vim="nvim"
 
+source /usr/share/nvm/init-nvm.sh
+
 export PATH=$PATH:$(go env GOPATH)/bin
 
