@@ -189,3 +189,6 @@ source /usr/share/nvm/init-nvm.sh
 
 export PATH=$PATH:$(go env GOPATH)/bin
 
+autoload bashcompinit
+bashcompinit
+source "/home/elveblest/.local/share/bash-completion/completions/am"
