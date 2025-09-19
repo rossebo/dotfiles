@@ -8,7 +8,7 @@ BLURRED_WALLPAPER="$CACHE_DIR/blurred_wallpaper.png"
 mkdir -p "$CACHE_DIR"
 
 # Define the path to the default background
-DEFAULT_BACKGROUND="$HOME/.config/backgrounds/shaded.png"
+DEFAULT_BACKGROUND="$WALLPAPER"
 
 # Check if the default background file exists
 if [ ! -f "$DEFAULT_BACKGROUND" ]; then
