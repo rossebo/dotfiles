@@ -1,6 +1,7 @@
-@import "mocha.css";
+@import "colors.css";
 
 * {
+  background: rgba(0, 0, 0, 0); /* Completely transparent */
   font-family: "MesloLGS Nerd Font Mono Bold";
   font-size: 16px;
   min-height: 0;
@@ -9,17 +10,15 @@
 
 window#waybar {
   background: transparent;
-  background-color: @crust;
-  color: @overlay0;
-  transition-property: background-color;
+  color: @foreground;
+  transition-property: foreground-color;
   transition-duration: 0.1s;
-  border-bottom: 1px solid @overlay1;
 }
 
 #window {
   margin: 8px;
-  padding-left: 8;
-  padding-right: 8;
+  padding-left: 8px;
+  padding-right: 8px;
 }
 
 button {
@@ -29,9 +28,8 @@ button {
 }
 
 button:hover {
-  background: inherit;
-  color: @mauve;
-  border-top: 2px solid @mauve;
+  background-color: inherit;
+  color: @foreground;
 }
 
 #workspaces button {
@@ -39,15 +37,11 @@ button:hover {
 }
 
 #workspaces button.focused {
-  background-color: rgba(0, 0, 0, 0.3);
-  color: @rosewater;
-  border-top: 2px solid @rosewater;
+  color: @foreground;
 }
 
 #workspaces button.active {
-  background-color: rgba(0, 0, 0, 0.3);
-  color: @mauve;
-  border-top: 2px solid @mauve;
+  color: @foreground;
 }
 
 #workspaces button.urgent {
@@ -76,23 +70,19 @@ button:hover {
 }
 
 #clock {
-  color: @maroon;
-  border-bottom: 2px solid @maroon;
+  color: @foreground;
 }
 
 #clock.date {
-  color: @mauve;
-  border-bottom: 2px solid @mauve;
+  color: @foreground;
 }
 
 #pulseaudio {
-  color: @blue;
-  border-bottom: 2px solid @blue;
+  color: @foreground;
 }
 
 #network {
-  color: @yellow;
-  border-bottom: 2px solid @yellow;
+  color: @foreground;
 }
 
 #idle_inhibitor {
@@ -101,11 +91,11 @@ button:hover {
 }
 
 #idle_inhibitor.activated {
-  color: @red;
+  color: @foreground;
 }
 
 #battery {
-  color: @green;
+  color: @foreground;
   border-bottom: 2px solid @green;
 }
 
@@ -120,7 +110,7 @@ button:hover {
 }
 
 #custom-vpn {
-  color: @lavender;
+  color: @foreground;
   border-radius: 15px;
   padding-left: 6px;
   padding-right: 6px;
