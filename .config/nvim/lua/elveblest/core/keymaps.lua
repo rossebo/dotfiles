@@ -3,7 +3,12 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Go back to netrw
-vim.keymap.set('n', '<leader>pv', vim.cmd.Ex)
+-- vim.keymap.set('n', '<leader>pv', vim.cmd.Ex)
+
+-- Open Oil
+vim.keymap.set('n', '<leader>pv', function()
+  require('oil').open()
+end, { desc = 'Open Oil' })
 
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 

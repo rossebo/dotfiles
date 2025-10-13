@@ -8,7 +8,7 @@ return {
         accept_word = '<C-j>',
       },
       color = {
-        suggestion_color = '#333333',
+        suggestion_color = '#f6f6f6',
         cterm = 244,
       },
       log_level = 'info', -- set to "off" to disable logging completely
