@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 
 # Define the cache directory and blurred wallpaper path
 CACHE_DIR="$HOME/.cache"
@@ -17,11 +17,11 @@ if [ ! -f "$DEFAULT_BACKGROUND" ]; then
 fi
 
 # Generate a blurred version of the wallpaper
-magick "$DEFAULT_BACKGROUND" -blur 0x8 "$BLURRED_WALLPAPER"
+BLUR_RADIUS=${1:-8}
+magick "$DEFAULT_BACKGROUND" -blur 0x"$BLUR_RADIUS" "$BLURRED_WALLPAPER"
 
 # Check if the blurred image was created successfully
-if [ $? -eq 0 ]; then
-else
+if [ $? -ne 0 ]; then
     echo "Failed to create blurred wallpaper."
     exit 1
 fi

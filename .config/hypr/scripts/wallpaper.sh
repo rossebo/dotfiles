@@ -54,3 +54,7 @@ pkill -SIGUSR2 waybar
 
 # 2. Tell hyprpaper to reload/set the new wallpaper
 hyprctl hyprpaper reload "$MONITOR,$WALLPAPER"
+
+export WALLPAPER="$WALLPAPER"
+
+source "$HOME/.config/hypr/scripts/blurred_wallpaper.sh"
