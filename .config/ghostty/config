@@ -1,30 +1,27 @@
-# Use zsh as the default shell
-shell-integration = "zsh"
+shell-integration = zsh
+font-family = JetBrains Mono
+theme = Dracula
+mouse-hide-while-typing = true
+scrollback-limit = 1000000
 
-# Font setup for icons and readability
-font-family = "MesloLGS NF"
+keybind = ctrl+n=new_window
 
-# Best theme ever
-theme = "catppuccin-macchiato"
+keybind = ctrl+h=goto_split:left
+keybind = ctrl+j=goto_split:bottom
+keybind = ctrl+k=goto_split:top
+keybind = ctrl+l=goto_split:right
 
-# For transparency
-background-opacity = 0.88
+keybind = ctrl+a>h=new_split:left
+keybind = ctrl+a>j=new_split:down
+keybind = ctrl+a>k=new_split:up
+keybind = ctrl+a>l=new_split:right
+keybind = ctrl+a>f=toggle_split_zoom
 
-# Cursor preferences
-cursor-style = "block"
-cursor-style-blink = true
-shell-integration-features = "no-cursor" # 
+keybind = ctrl+a>n=next_tab
+keybind = ctrl+a>p=previous_tab
+
+keybind = super+r=reload_config
+
+window-save-state = always
 
 
-
-# Window size and padding
-window-width = 115
-window-height = 45
-window-padding-y = 25,1
-window-padding-x = 1,1
-
-# Minimal macOS titlebar for cleaner appearance
-macos-titlebar-style = "hidden"
-macos-titlebar-proxy-icon = "hidden"
-
-shell-integration-features = ssh-env,ssh-terminfo
