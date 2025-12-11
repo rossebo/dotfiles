@@ -109,6 +109,9 @@ source $ZSH/oh-my-zsh.sh
 #
 eval "$(starship init zsh)"
 
+if [[ "$TERM_PROGRAM" == "ghostty" ]]; then
+    export TERM=xterm-256color
+fi
 
 export PATH="$PATH:$HOME/.dotnet/tools/"
 export PATH="$PATH:$HOME/Scripts/"
@@ -185,10 +188,11 @@ eval "$(zoxide init zsh)"
 alias cd="z"
 alias vim="nvim"
 
-source /usr/share/nvm/init-nvm.sh
+# source /usr/share/nvm/init-nvm.sh
 
 export PATH=$PATH:$(go env GOPATH)/bin
 
 autoload bashcompinit
 bashcompinit
-source "/home/elveblest/.local/share/bash-completion/completions/am"
+# source "${HOME}/.local/share/bash-completion/completions/am"
+source "${HOME}/.env"
