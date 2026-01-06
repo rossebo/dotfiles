@@ -7,7 +7,7 @@ sketchybar --add item media e \
 		icon.padding_left=0 \
 		scroll_texts=on \
 		icon=􀑪 \
-		icon_color=$ACCENT_COLOR \
+		icon.color=$ACCENT_COLOR \
 		background.drawing=off \
 		script="$PLUGIN_DIR/media.sh" \
 	--subscribe media media_change 

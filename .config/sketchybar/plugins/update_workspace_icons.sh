@@ -16,7 +16,7 @@ update_space_icons() {
     else
         icon_strip=""
     fi
-    sketchybar --set space.$sid label="$icon_strip"
+    sketchybar --set space.$sid icon.color=$ACCENT_COLOR background.color=$BAR_COLOR   \
 }
 
 # Update all workspaces to ensure clean state
