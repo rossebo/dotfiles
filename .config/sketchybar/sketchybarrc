@@ -27,8 +27,6 @@ sketchybar --default icon.font="SF Pro:Semibold:15.0"  \
                      padding_right=5                   \
                      label.padding_left=10             \
                      label.padding_right=10            \
-                     icon.padding_left=4               \
-                     icon.padding_right=4              \
                      background.color=$ITEM_BG_COLOR   \
                      background.corner_radius=5        \
                      background.height=24              \
@@ -36,38 +34,35 @@ sketchybar --default icon.font="SF Pro:Semibold:15.0"  \
 ##### Adding aerospace layouts #####
 sketchybar --add event aerospace_workspace_change
 
-# Add workspaces for all valid monitors
-for monitor in $(aerospace list-monitors --format "%{monitor-appkit-nsscreen-screens-id}"); do
-  if [[ "$monitor" =~ ^[1-2]$ ]]; then  # Ensure only valid monitor IDs are processed
-    for sid in $(aerospace list-workspaces --monitor "$monitor"); do
-      display_id="$monitor"
-      
-      sketchybar --add item space.$sid left \
-        --set space.$sid display="$display_id" \
-        --subscribe space.$sid aerospace_workspace_change \
-        --set space.$sid \
-        drawing=on \
-        background.color=$BAR_COLOR \
-        background.corner_radius=5 \
-        background.drawing=on \
-        background.border_color=0xAAFFFFFF \
-        background.border_width=0 \
-        background.height=25 \
-        icon="$sid" \
-        icon.color=$ACCENT_COLOR \
-        icon.padding_left=10 \
-        label.font="sketchybar-app-font:Regular:16.0" \
-        label.color=$ACCENT_COLOR \
-        label.padding_right=10 \
-        label.padding_left=0 \
-        label.y_offset=0 \
-        label.shadow.drawing=off \
-        click_script="aerospace workspace $sid" \
-        script="$PLUGIN_DIR/space.sh"
-    done
-  else
-    echo "Invalid monitor ID: $monitor"
-  fi
+# Loop through monitors by ID (1, 2)
+for m in $(aerospace list-monitors --format %{monitor-id}); do
+  
+  # -----------------------------------------------------------------------------
+  # MAPPING FIX: Manually map Aerospace IDs to SketchyBar Displays
+  # Aerospace ID 1 (Retina) -> SketchyBar Display 2
+  # Aerospace ID 2 (LG TV)  -> SketchyBar Display 1
+  # -----------------------------------------------------------------------------
+  case "$m" in
+    1) target_display="2" ;;
+    2) target_display="1" ;;
+    *) target_display="$m" ;; # Fallback just in case
+  esac
+
+  # Loop through workspaces on this specific monitor
+  for sid in $(aerospace list-workspaces --monitor "$m"); do
+    
+    sketchybar --add item space.$sid left \
+      --subscribe space.$sid aerospace_workspace_change \
+      --set space.$sid \
+      display="$target_display" \
+      background.color=0x44ffffff \
+      background.corner_radius=5 \
+      background.height=20 \
+      background.drawing=off \
+      label="$sid" \
+      click_script="aerospace workspace $sid" \
+      script="$PLUGIN_DIR/space.sh"
+  done
 done
 
 # Load Icons on startup for all monitors
@@ -94,7 +89,7 @@ done
 
 ##### Adding Left Items #####
 # We add some regular items to the left side of the bar
-source $ITEM_DIR/spaces.sh
+#source $ITEM_DIR/spaces.sh
 source $ITEM_DIR/front_app.sh
 source $ITEM_DIR/media.sh
 
@@ -106,3 +101,5 @@ source $ITEM_DIR/cpu.sh
 
 ##### Finalizing Setup #####
 sketchybar --update
+# Force a focus event on load so the current workspace highlights immediately
+sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$(aerospace list-workspaces --focused)
