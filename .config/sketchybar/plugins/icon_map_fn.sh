@@ -1,3 +1,4 @@
+#!/bin/bash
 
 function icon_map() {
   case "$1" in
@@ -10,7 +11,7 @@ function icon_map() {
   "VMware Fusion")
     icon_result=":vmware_fusion:"
     ;;
-  "Alacritty" | "Hyper" | "iTerm2" | "kitty" | "Terminal" | "终端" | "WezTerm")
+  "Alacritty" | "Hyper" | "iTerm2" | "kitty" | "Terminal" | "终端" | "WezTerm" | "Ghostty" | "Jetbrains Rider")
     icon_result=":terminal:"
     ;;
   "Microsoft To Do" | "Things")
@@ -87,9 +88,6 @@ function icon_map() {
     ;;
   "Kakoune")
     icon_result=":kakoune:"
-    ;;
-  "Rider" | "JetBrains Rider")
-    icon_result=":rider:"
     ;;
   "Godot")
     icon_result=":godot:"
@@ -169,7 +167,7 @@ function icon_map() {
   "Spotify")
     icon_result=":spotify:"
     ;;
-  "Neovide" | "MacVim" | "Vim" | "VimR")
+  "Neovide" | "MacVim" | "Vim" | "VimR" )
     icon_result=":vim:"
     ;;
   "KeePassXC")
