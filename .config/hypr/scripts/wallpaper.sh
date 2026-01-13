@@ -22,19 +22,24 @@ fi
 echo "Monitor: $MONITOR"
 
 # --- 2. SELECT WALLPAPER ---
-
-# Safer parsing for current wallpaper, assuming hyprpaper is now working.
-CURRENT_WALL_PATH=$(hyprctl hyprpaper listactive | awk -F ' = ' '{print $2}' | head -n 1)
-
-# Find a random wallpaper that is not the current one.
-WALLPAPER=$(find "$WALLPAPER_DIR" -type f ! -path "$CURRENT_WALL_PATH" | shuf -n 1)
-
-# Fallback in case the directory only contains the current wallpaper
-if [ -z "$WALLPAPER" ]; then
+if [ -f "$1" ]; then
+    WALLPAPER="$1"
+    echo "Selected Wallpaper: $WALLPAPER"
+else
+    # If no argument is passed, use a random wallpaper from the directory
     WALLPAPER=$(find "$WALLPAPER_DIR" -type f | shuf -n 1)
-fi
+    # Safer parsing for current wallpaper, assuming hyprpaper is now working.
+    CURRENT_WALL_PATH=$(hyprctl hyprpaper listactive | awk -F ' = ' '{print $2}' | head -n 1)
 
-echo "Selected Wallpaper: $WALLPAPER"
+    # Find a random wallpaper that is not the current one.
+    WALLPAPER=$(find "$WALLPAPER_DIR" -type f ! -path "$CURRENT_WALL_PATH" | shuf -n 1)
+
+    # Fallback in case the directory only contains the current wallpaper
+    if [ -z "$WALLPAPER" ]; then
+        WALLPAPER=$(find "$WALLPAPER_DIR" -type f | shuf -n 1)
+    fi
+    echo "Selected Wallpaper (fallback): $WALLPAPER"
+fi
 
 if [ -z "$WALLPAPER" ]; then
     echo "ERROR: No wallpapers found in $WALLPAPER_DIR. Aborting."
@@ -57,4 +62,4 @@ hyprctl hyprpaper reload "$MONITOR,$WALLPAPER"
 
 export WALLPAPER="$WALLPAPER"
 
-source "$HOME/.config/hypr/scripts/blurred_wallpaper.sh"
+sh "$HOME/.config/hypr/scripts/blurred_wallpaper.sh"
