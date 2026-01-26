@@ -1,65 +1,48 @@
 #!/bin/bash
 
-# --- 1. ENVIRONMENT & MONITOR SETUP ---
-
-# This line is primarily for debugging; make sure $WALLPAPER_DIR is exported externally.
-echo "Wallpaper Dir: $WALLPAPER_DIR" 
-
-# Use jq to get the currently focused monitor for robustness (requires 'jq')
+# --- 1. SETUP VARIABLES ---
+# Define directory and find monitor
+WALLPAPER_DIR="$HOME/.config/backgrounds/"
 MONITOR=$(hyprctl monitors -j | jq -r '.[] | select(.focused) | .name')
 
-# Fallback in case jq or focus detection fails (gets the first listed monitor)
+# Fallback if jq fails
 if [ -z "$MONITOR" ]; then
     MONITOR=$(hyprctl monitors | awk '/^Monitor/ {print $2}' | head -n 1)
 fi
 
-# Critical check: Exit gracefully if no monitor is found
-if [ -z "$MONITOR" ]; then
-    echo "ERROR: Could not determine active monitor. Aborting script."
-    exit 1
-fi
-
-echo "Monitor: $MONITOR"
-
 # --- 2. SELECT WALLPAPER ---
-if [ -f "$1" ]; then
+if [ -n "$1" ] && [ -f "$1" ]; then
+    # If argument provided (from menu), use it
     WALLPAPER="$1"
-    echo "Selected Wallpaper: $WALLPAPER"
 else
-    # If no argument is passed, use a random wallpaper from the directory
+    # Otherwise pick random
     WALLPAPER=$(find "$WALLPAPER_DIR" -type f | shuf -n 1)
-    # Safer parsing for current wallpaper, assuming hyprpaper is now working.
-    CURRENT_WALL_PATH=$(hyprctl hyprpaper listactive | awk -F ' = ' '{print $2}' | head -n 1)
-
-    # Find a random wallpaper that is not the current one.
-    WALLPAPER=$(find "$WALLPAPER_DIR" -type f ! -path "$CURRENT_WALL_PATH" | shuf -n 1)
-
-    # Fallback in case the directory only contains the current wallpaper
-    if [ -z "$WALLPAPER" ]; then
-        WALLPAPER=$(find "$WALLPAPER_DIR" -type f | shuf -n 1)
-    fi
-    echo "Selected Wallpaper (fallback): $WALLPAPER"
 fi
 
-if [ -z "$WALLPAPER" ]; then
-    echo "ERROR: No wallpapers found in $WALLPAPER_DIR. Aborting."
-    exit 1
+echo "Setting $WALLPAPER on $MONITOR"
+
+# --- 3. GENERATE COLORS (Pywal) ---
+# Check if wal exists before running to avoid errors
+if command -v wal &> /dev/null; then
+    wal -i "$WALLPAPER" -n -q -t
+    pkill -SIGUSR2 waybar
 fi
 
-# --- 3. APPLY COLORS (WAL) & RELOAD WAYBAR ---
+# --- 4. APPLY WALLPAPER (The Fix) ---
+# Hyprpaper now STRICTLY requires 'preload' then 'wallpaper'
 
-# 1. Run pywal FIRST to extract colors and generate templates
-wal -i "$WALLPAPER" -q -s -t 
+# 1. Unload everything to free RAM (Optional but recommended)
+hyprctl hyprpaper unload all
 
-echo "Restarting waybar to apply new colors"
-# Use pkill -USR2 for cross-compatibility
-pkill -SIGUSR2 waybar
+# 2. Preload the new image into memory
+hyprctl hyprpaper preload "$WALLPAPER"
 
-# --- 4. APPLY WALLPAPER (HYPRPAPER) ---
+# 3. Apply the image to the monitor
+# Syntax: hyprctl hyprpaper wallpaper "monitor,path"
+hyprctl hyprpaper wallpaper "$MONITOR,$WALLPAPER"
 
-# 2. Tell hyprpaper to reload/set the new wallpaper
-hyprctl hyprpaper reload "$MONITOR,$WALLPAPER"
-
+# --- 5. UPDATE LOCKSCREEN ---
 export WALLPAPER="$WALLPAPER"
-
-sh "$HOME/.config/hypr/scripts/blurred_wallpaper.sh"
+if [ -f "$HOME/.config/hypr/scripts/blurred_wallpaper.sh" ]; then
+    bash "$HOME/.config/hypr/scripts/blurred_wallpaper.sh" &
+fi
