@@ -37,16 +37,7 @@ sketchybar --add event aerospace_workspace_change
 # Loop through monitors by ID (1, 2)
 for m in $(aerospace list-monitors --format %{monitor-id}); do
   
-  # -----------------------------------------------------------------------------
-  # MAPPING FIX: Manually map Aerospace IDs to SketchyBar Displays
-  # Aerospace ID 1 (Retina) -> SketchyBar Display 2
-  # Aerospace ID 2 (LG TV)  -> SketchyBar Display 1
-  # -----------------------------------------------------------------------------
-  case "$m" in
-    1) target_display="2" ;;
-    2) target_display="1" ;;
-    *) target_display="$m" ;; # Fallback just in case
-  esac
+  target_display="$m"
 
   # Loop through workspaces on this specific monitor
   for sid in $(aerospace list-workspaces --monitor "$m"); do

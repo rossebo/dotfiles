@@ -10,9 +10,9 @@ return { -- LSP Configuration & Plugins
     -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
     { 'j-hui/fidget.nvim', opts = {} },
 
-    -- `neodev` configures Lua LSP for your Neovim config, runtime and plugins
+    -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
     -- used for completion, annotations and signatures of Neovim apis
-    { 'folke/neodev.nvim', opts = {} },
+    { 'folke/lazydev.nvim', ft = 'lua', opts = {} },
   },
   config = function()
     -- Brief aside: **What is LSP?**
@@ -148,17 +148,27 @@ return { -- LSP Configuration & Plugins
       --
 
       lua_ls = {
-        -- cmd = {...},
-        -- filetypes = { ...},
-        -- capabilities = {},
         settings = {
           Lua = {
             completion = {
               callSnippet = 'Replace',
             },
-            -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-            -- diagnostics = { disable = { 'missing-fields' } },
           },
+        },
+      },
+
+      -- Restrict emmet_ls to filetypes nvim knows about (avoids Unknown filetype warnings)
+      emmet_ls = {
+        filetypes = { 'html', 'typescriptreact', 'javascriptreact', 'css', 'sass', 'scss', 'less', 'svelte' },
+      },
+
+      -- Restrict tailwindcss to filetypes nvim knows about (avoids Unknown filetype warnings)
+      tailwindcss = {
+        filetypes = {
+          'html', 'css', 'scss', 'less', 'sass',
+          'javascript', 'javascriptreact',
+          'typescript', 'typescriptreact',
+          'svelte', 'vue', 'astro', 'markdown',
         },
       },
     }
@@ -176,6 +186,8 @@ return { -- LSP Configuration & Plugins
     local ensure_installed = vim.tbl_keys(servers or {})
     vim.list_extend(ensure_installed, {
       'stylua', -- Used to format Lua code
+      'black', -- Python formatter
+      'isort', -- Python import sorter
     })
     require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 

@@ -24,4 +24,7 @@ keybind = super+r=reload_config
 
 window-save-state = always
 
-
+# macOS configuration
+macos-non-native-fullscreen = false
+macos-option-as-alt = false
+macos-titlebar-style = transparent
