@@ -72,6 +72,7 @@ outer.right = 5
 [mode.main.binding]
 
 # All possible keys:
+
 # - Letters.        a, b, c, ..., z
 # - Numbers.        0, 1, 2, ..., 9
 # - Keypad numbers. keypad0, keypad1, keypad2, ..., keypad9
@@ -140,6 +141,11 @@ alt-shift-tab = 'move-workspace-to-monitor --wrap-around next'
 # See: https://nikitabobko.github.io/AeroSpace/commands#mode
 alt-shift-semicolon = 'mode service'
 
+
+[[on-window-detected]]
+if.app-id = 'com.mitchellh.ghostty'
+run = ['layout tiling', 'layout tiles horizontal']
+
 # 'service' binding mode declaration.
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
 [mode.service.binding]
@@ -155,8 +161,4 @@ alt-shift-k = ['join-with up', 'mode main']
 alt-shift-l = ['join-with right', 'mode main']
 alt-shift-f = 'fullscreen'
 
-[[on-window-detected]]
-if.app-id="com.mitchellh.ghostty"
-run= [
-  "layout tiling",
-]
+

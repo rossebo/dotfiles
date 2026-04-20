@@ -63,3 +63,7 @@ vim.opt.hlsearch = true
 
 -- Use Unix file formats over Windows over OS9 formats
 vim.opt.fileformats = { 'unix', 'dos', 'mac' }
+
+-- Disable unused providers to suppress checkhealth warnings
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_ruby_provider = 0
