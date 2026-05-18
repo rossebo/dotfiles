@@ -115,3 +115,7 @@ button:hover {
   padding-left: 6px;
   padding-right: 6px;
 }
+
+#language {
+  padding: 0 10px;
+}

@@ -102,6 +102,7 @@ eval "$(zoxide init zsh)"
 
 alias cd="z"
 alias vim="nvim"
+alias open="xdg-open"
 
 # source /usr/share/nvm/init-nvm.sh
 

@@ -11,11 +11,17 @@
   "modules-right": [
     "network",
     "pulseaudio",
+    "hyprland/language",
     "clock"
   ],
   "clock": {
     "format": "<span>   </span>{:%a %d %H:%M}",
     "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+  },
+  "hyprland/language": {
+    "format": "<span>   </span>{}",
+    "format-en": "EN",
+    "format-no": "NO"
   },
   "network": {
     "interface": "enp7s0",
