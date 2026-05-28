@@ -25,7 +25,7 @@ return {
           'roslyn',
           '--stdio',
           '--logLevel=Information',
-          '--extensionLogDirectory=' .. vim.fs.dirname(vim.lsp.get_log_path()),
+          '--extensionLogDirectory=' .. vim.fs.dirname(vim.lsp.log.get_filename()),
           '--razorSourceGenerator='
             .. vim.fs.joinpath(vim.fn.stdpath 'data' --[[@as string]], 'mason', 'packages', 'rzls', 'libexec', 'Microsoft.CodeAnalysis.Razor.Compiler.dll'),
           '--razorDesignTimePath=' .. vim.fs.joinpath(
