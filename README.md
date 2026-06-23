@@ -16,3 +16,9 @@ TODO: Add install prompt
 
 zsh
 TODO: Install prompt
+
+
+Add this to .gitconfig
+[alias]
+	go-default = "!f() { default=$(git symbolic-ref refs/remotes/origin/HEAD | sed \"s|^refs/remotes/origin/||\"); git switch \"$default\"; }; f"
+	go = !git switch $(git symbolic-ref refs/remotes/origin/HEAD | sed \"s|^refs/remotes/origin/||\")
