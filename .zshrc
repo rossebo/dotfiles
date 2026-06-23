@@ -102,8 +102,9 @@ eval "$(zoxide init zsh)"
 
 alias cd="z"
 alias vim="nvim"
-alias open="xdg-open"
-
+if [[ "$(uname)" != "Darwin" ]]; then
+  alias open='xdg-open'
+fi
 # source /usr/share/nvm/init-nvm.sh
 
 export PATH=$PATH:$(go env GOPATH)/bin
