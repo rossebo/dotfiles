@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Get the current branch name
+branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
+
+# Check if we are on master or main
+if [ "$branch" = "master" ] || [ "$branch" = "main" ]; then
+    
+    # Git hooks don't run attached to standard input by default.
+    # We must explicitly read from /dev/tty to show a CLI prompt.
+    exec < /dev/tty
+    
+    echo -e "\n⚠️  Wait! You are about to commit directly to '$branch'."
+    read -p "Are you absolutely sure you want to do this? [y/N] " response
+    
+    if [[ ! "$response" =~ ^[Yy]$ ]]; then
+        echo "Commit aborted. Phew! 😅"
+        exit 1
+    fi
+fi
+
+# Exit successfully if not on master/main, or if the user typed 'Y'
+exit 0
