@@ -102,10 +102,7 @@ eval "$(zoxide init zsh)"
 
 alias cd="z"
 alias vim="nvim"
-
-if [[ "$(uname)" != "Darwin" ]]; then
-  alias open='xdg-open'
-fi
+alias open="xdg-open"
 
 # source /usr/share/nvm/init-nvm.sh
 
