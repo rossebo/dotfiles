@@ -23,8 +23,11 @@
         enable = true;
         onActivation = {
           autoUpdate = true;
-          cleanup = "zap"; 
+          cleanup = "zap";
         };
+        taps = [
+          "nikitabobko/tap"
+        ];
         brews = [
           "aom"
           "azure-cli"
@@ -125,6 +128,7 @@
         ];
         casks = [
           "alfred"
+          "nikitabobko/tap/aerospace"
           "bazecor"
           "blender"
           "discord"
