@@ -56,6 +56,12 @@
   overflow: hidden;
 }
 
+/* Show full tab labels in vertical tabs mode */
+#tabbrowser-tabs[orient="vertical"] .tab-label-container {
+  max-width: unset !important;
+  overflow: visible !important;
+}
+
 .tab-icon-sound-label {
   display: none !important;
 }
