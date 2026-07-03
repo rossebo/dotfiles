@@ -103,15 +103,24 @@ return { -- LSP Configuration & Plugins
         --
         -- When you move your cursor, the highlights will be cleared (the second autocommand).
         local client = vim.lsp.get_client_by_id(event.data.client_id)
-        if client and client.server_capabilities.documentHighlightProvider then
+        if client and client:supports_method('textDocument/documentHighlight') then
+          local highlight_augroup = vim.api.nvim_create_augroup('lsp-highlight-' .. event.buf, { clear = true })
           vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
             buffer = event.buf,
+            group = highlight_augroup,
             callback = vim.lsp.buf.document_highlight,
           })
-
           vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
             buffer = event.buf,
+            group = highlight_augroup,
             callback = vim.lsp.buf.clear_references,
+          })
+          vim.api.nvim_create_autocmd('LspDetach', {
+            buffer = event.buf,
+            once = true,
+            callback = function()
+              pcall(vim.api.nvim_del_augroup_by_name, 'lsp-highlight-' .. event.buf)
+            end,
           })
         end
       end,
@@ -146,6 +155,9 @@ return { -- LSP Configuration & Plugins
       -- But for many setups, the LSP (`tsserver`) will work just fine
       -- tsserver = {},
       --
+
+      ts_ls = {},
+      cssls = {},
 
       lua_ls = {
         settings = {
