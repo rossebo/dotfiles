@@ -5,6 +5,9 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
+# Homebrew
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
@@ -115,3 +118,5 @@ autoload bashcompinit
 bashcompinit
 # source "${HOME}/.local/share/bash-completion/completions/am"
 source "${HOME}/.env"
+
+. "$HOME/.local/bin/env"
