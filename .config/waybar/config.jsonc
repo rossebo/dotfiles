@@ -1,7 +1,7 @@
 {
   "layer": "top",
   "position": "top",
-  "height": 37,
+  "height": 44,
   "modules-left": [
     "hyprland/workspaces"
   ],
@@ -14,31 +14,26 @@
     "hyprland/language",
     "clock"
   ],
-  "clock": {
-    "format": "<span>   </span>{:%a %d %H:%M}",
+"clock": {
+    "format": "<span size='130%'> </span> {:%a %d %H:%M}",
     "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
   },
   "hyprland/language": {
-    "format": "<span>   </span>{}",
+    "format": "<span size='130%'> </span> {}",
     "format-en": "EN",
     "format-no": "NO"
   },
   "network": {
     "interface": "enp7s0",
-    "format": "{ifname}",
-    "format-ethernet": "󰊗  Online",
-    "format-disconnected": "DCed", //An empty format will hide the module.
+    "format-ethernet": "<span size='130%'>󰊗 </span> Online",
+    "format-disconnected": "<span size='130%'>󰊗 </span> Offline",
     "max-length": 50
   },
   "pulseaudio": {
-    "format": "{icon}  {volume}%",
-    "format-muted": "",
+    "format": "<span size='130%'>{icon}</span>  {volume}%",
+    "format-muted": "<span size='130%'> </span> Muted",
     "format-icons": {
-      "default": [
-        "",
-        "",
-        " "
-      ]
+      "default": ["", "", ""]
     },
     "on-click": "pavucontrol"
   }

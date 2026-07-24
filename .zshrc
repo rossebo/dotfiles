@@ -114,3 +114,4 @@ autoload bashcompinit
 bashcompinit
 # source "${HOME}/.local/share/bash-completion/completions/am"
 source "${HOME}/.env"
+export PATH="$HOME/.local/bin:$PATH"

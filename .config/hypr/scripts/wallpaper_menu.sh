@@ -16,9 +16,6 @@ fi
 # Use find to list PNG and JPG files and pipe them to wofi
 selected_wallpaper=$(find "$WALLPAPER_DIR" -type f \( -iname "*.jpg" -o -iname "*.png" \) | wofi --show dmenu -p "Select Wallpaper:")
 
-# 2. If a wallpaper was selected (not empty)
 if [ -n "$selected_wallpaper" ]; then
-    # 3. Execute the main script with the selected path as the argument
-    # Use 'sh' to execute the main script, ensuring it's in a subshell
-    sh "$WALLPAPER_SCRIPT" "$selected_wallpaper" &
+    bash "$WALLPAPER_SCRIPT" "$selected_wallpaper" &
 fi
