@@ -9,8 +9,9 @@ local mainMod = "ALT"
 local secondaryMod = "SUPER"
 local terminal = "ghostty"
 local fileManager = "dolphin"
-local menu = "wofi --show drun"
+local menu = "wofi --show drun -i"
 local wallpaper_script = os.getenv("HOME") .. "/.config/hypr/scripts/wallpaper_menu.sh"
+-- local window_switcher = os.getenv("HOME") .. "/.config/hypr/scripts/wofi_window.sh"
 
 -- ========================================================
 -- 📦 ENVIRONMENT VARIABLES
@@ -147,11 +148,19 @@ hl.on("hyprland.start", function()
 	-- FIXED: Swapped 'Macchiato Light' to 'Mocha Mauve' to match env vars and prevent window transition flickering
 	hl.exec_cmd("hyprctl setcursor Catppuccin Mocha Mauve 24")
 	hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")
+	hl.exec_cmd("sleep 0.5 && $HOME/.config/hypr/scripts/wallpaper.sh &")
+	hl.exec_cmd("[workspace 8 silent] firefox --kiosk -P homeassistant --new-instance http://localhost:8123")
 end)
 
 -- ========================================================
 -- 📦 WINDOW RULES
 -- ========================================================
+--
+hl.config({
+    misc = {
+        focus_on_activate = false
+    }
+})
 -- 1. Browser Picture-in-Picture
 hl.window_rule({
 	name = "pip",
@@ -164,8 +173,20 @@ hl.window_rule({
 -- 2. Core Workspace Rules
 hl.window_rule({ name = "ghostty", match = { title = "^(Ghostty)$" }, tile = true, workspace = "1" })
 hl.window_rule({ name = "firefox", match = { title = "^(Firefox)$" }, tile = true, workspace = "2" })
-hl.window_rule({ name = "battlenet", match = { title = "Battle.net" }, tile = true, workspace = "3" })
+hl.window_rule({
+	name = "battlenet",
+	match = { title = "Battle.net" },
+	tile = true,
+	workspace = "3 silent",  -- 🤫 The 'silent' flag forces it to open in the background
+	no_initial_focus = true, -- 🛑 Blocks it from snatching focus upon spawning
+})
 hl.window_rule({ name = "steam-main", match = { title = "Steam" }, tile = true, workspace = "3" })
+hl.window_rule({
+	name = "faugus-launcher", 
+	match = { class = "^faugus-launcher$" }, 
+	tile = true, 
+	workspace = "3" 
+})
 hl.window_rule({ name = "discord", match = { title = "Discord" }, tile = true, workspace = "5" })
 
 -- 3. Gaming Optimizations
@@ -212,6 +233,11 @@ hl.window_rule({
 	workspace = "9 silent",
 	no_initial_focus = true,
 })
+hl.window_rule({
+	name = "global-anti-focus-steal",
+	match = { class = ".*" },
+	suppress_event = "activate activatefocus",
+})
 
 hl.window_rule({
 	name = "wine-errors",
@@ -251,7 +277,8 @@ hl.bind(mainMod .. " + SHIFT + O", hl.dsp.exec_cmd("hyprlock"))
 hl.bind(mainMod .. " + SHIFT + Y", hl.dsp.exec_cmd("wlogout"))
 
 hl.bind("CTRL + space", hl.dsp.exec_cmd("hyprctl switchxkblayout all next"))
-
+hl.bind("ALT + Tab", hl.dsp.window.cycle_next())
+-- hl.bind("CTRL + Up", hl.dsp.exec_cmd(window_switcher)) -- DOes not work
 -- 📋 MAC-STYLE CLIPBOARD (SUPER FOR COPY/PASTE/CUT)
 -- hl.bind("SUPER + C", hl.dsp.send_shortcut({ mods = "CTRL", key = "C" }))
 -- hl.bind("SUPER + V", hl.dsp.send_shortcut({ mods = "CTRL", key = "V" }))
