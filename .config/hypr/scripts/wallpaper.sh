@@ -28,10 +28,18 @@ if command -v wal &> /dev/null; then
     pkill -SIGUSR2 waybar
 fi
 
-# --- 4. APPLY WALLPAPER (The Modern Fix) ---
-# Modern hyprpaper strictly requires a space after commas and a fit_mode argument!
-# Syntax: hyprctl hyprpaper wallpaper "monitor, path, fit_mode"
-hyprctl hyprpaper wallpaper "$MONITOR, $WALLPAPER, cover"
+# --- 4. APPLY WALLPAPER (The Fix) ---
+# Hyprpaper now STRICTLY requires 'preload' then 'wallpaper'
+
+# 1. Unload everything to free RAM (Optional but recommended)
+hyprctl hyprpaper unload all
+
+# 2. Preload the new image into memory
+hyprctl hyprpaper preload "$WALLPAPER"
+
+# 3. Apply the image to the monitor
+# Syntax: hyprctl hyprpaper wallpaper "monitor,path"
+hyprctl hyprpaper wallpaper "$MONITOR,$WALLPAPER"
 
 # --- 5. UPDATE LOCKSCREEN ---
 export WALLPAPER="$WALLPAPER"
