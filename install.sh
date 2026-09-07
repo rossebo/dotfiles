@@ -131,4 +131,26 @@ if [ -n "$ZSH_BIN" ] && [ "${SHELL:-}" != "$ZSH_BIN" ]; then
   fi
 fi
 
+# --- Make interactive bash sessions exec into zsh ---------------------------
+# GitHub Codespaces terminals (both the VS Code integrated terminal and
+# 'gh codespace ssh') always start 'bash' for the session, regardless of the
+# /etc/passwd shell field set above by usermod/chsh. The standard workaround
+# is to have bash exec into zsh for interactive sessions.
+if [ -n "$ZSH_BIN" ]; then
+  BASHRC="$HOME/.bashrc"
+  MARKER="# >>> dotfiles: exec zsh for interactive sessions >>>"
+  if [ ! -f "$BASHRC" ] || ! grep -qF "$MARKER" "$BASHRC" 2>/dev/null; then
+    echo "==> Adding exec-zsh snippet to $BASHRC"
+    {
+      echo ""
+      echo "$MARKER"
+      echo "if [ -t 1 ] && [ -z \"\${DOTFILES_ZSH_EXECED:-}\" ] && command -v zsh >/dev/null 2>&1; then"
+      echo "  export DOTFILES_ZSH_EXECED=1"
+      echo "  exec zsh"
+      echo "fi"
+      echo "# <<< dotfiles: exec zsh for interactive sessions <<<"
+    } >> "$BASHRC"
+  fi
+fi
+
 echo "==> Dotfiles bootstrap complete. Open a new terminal (or restart the Codespace shell) to use zsh."
