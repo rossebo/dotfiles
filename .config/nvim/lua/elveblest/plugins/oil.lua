@@ -7,6 +7,7 @@ return {
     view_options = {
       -- Show hidden files by default.
       show_hidden = true,
+      statusline = "",
     },
     -- Use the default keymaps (g., -, _, etc.)
   },
