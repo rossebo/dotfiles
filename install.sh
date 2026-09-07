@@ -16,6 +16,17 @@
 # checksum-format bug silently skipped stow/shell setup entirely.
 set -uo pipefail
 
+# Guarantee this script never blocks waiting on stdin/interactive input, no
+# matter what runs inside it. Codespace/container creation has no TTY, so any
+# accidental prompt (debconf, git credential prompt, a tool's own interactive
+# y/n) would hang the whole bootstrap forever with no visible error. We've
+# seen exactly this class of bug hang a codespace via another tool's
+# interactive prompt, so apply the same defense here even though this script
+# doesn't currently trigger one.
+export DEBIAN_FRONTEND=noninteractive
+export DEBCONF_NONINTERACTIVE_SEEN=true
+export GIT_TERMINAL_PROMPT=0
+
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$DOTFILES_DIR"
 
@@ -31,15 +42,15 @@ mkdir -p "$HOME/.local/bin"
 # --- Install packages available via apt -------------------------------------
 if command -v apt-get >/dev/null 2>&1; then
   echo "==> Installing packages via apt-get"
-  $SUDO apt-get update -y
+  $SUDO apt-get update -y </dev/null
 
   # Required by these dotfiles / this script.
-  $SUDO apt-get install -y zsh git curl ca-certificates stow tmux
+  $SUDO apt-get install -y zsh git curl ca-certificates stow tmux </dev/null
 
   # Referenced in .zshrc but optional: install what's available in this
   # Ubuntu release and skip the rest instead of failing the whole script.
   for pkg in fzf bat fd-find eza zoxide; do
-    $SUDO apt-get install -y "$pkg" || echo "==> Skipping unavailable apt package: $pkg"
+    $SUDO apt-get install -y "$pkg" </dev/null || echo "==> Skipping unavailable apt package: $pkg"
   done
 else
   echo "==> apt-get not found, skipping apt package installation."
@@ -134,7 +145,7 @@ clone_if_missing() {
   local repo="$1" dest="$2"
   if [ ! -d "$dest" ]; then
     echo "==> Cloning $repo -> $dest"
-    git clone --depth=1 "https://github.com/${repo}.git" "$dest" || echo "==> Failed to clone $repo, skipping."
+    git clone --depth=1 "https://github.com/${repo}.git" "$dest" </dev/null || echo "==> Failed to clone $repo, skipping."
   fi
 }
 
@@ -190,7 +201,7 @@ install_starship
 if command -v npm >/dev/null 2>&1; then
   if ! command -v copilot >/dev/null 2>&1; then
     echo "==> Installing GitHub Copilot CLI (@github/copilot) via npm"
-    npm install -g @github/copilot || echo "==> Failed to install GitHub Copilot CLI, skipping."
+    npm install -g @github/copilot </dev/null || echo "==> Failed to install GitHub Copilot CLI, skipping."
   else
     echo "==> GitHub Copilot CLI already installed ($(copilot --version 2>/dev/null || echo 'unknown version'))"
   fi
