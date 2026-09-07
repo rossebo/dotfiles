@@ -119,7 +119,16 @@ ZSH_BIN="$(command -v zsh || true)"
 if [ -n "$ZSH_BIN" ] && [ "${SHELL:-}" != "$ZSH_BIN" ]; then
   echo "==> Setting zsh as the default shell"
   grep -qxF "$ZSH_BIN" /etc/shells 2>/dev/null || echo "$ZSH_BIN" | $SUDO tee -a /etc/shells >/dev/null
-  $SUDO chsh -s "$ZSH_BIN" "$(whoami)" || echo "==> Could not chsh automatically; run 'chsh -s $ZSH_BIN' manually."
+  # Use usermod instead of chsh: chsh authenticates via PAM against the
+  # *target* user's own password, which fails non-interactively (no TTY
+  # during dotfiles install, and Codespaces users typically have no
+  # password set at all). usermod edits /etc/passwd directly as root and
+  # needs no interactive auth.
+  if $SUDO usermod -s "$ZSH_BIN" "$(whoami)"; then
+    echo "==> Default shell set to $ZSH_BIN (restart your terminal/session for it to take effect)"
+  else
+    echo "==> Could not set default shell automatically; run 'sudo usermod -s $ZSH_BIN \$(whoami)' manually."
+  fi
 fi
 
 echo "==> Dotfiles bootstrap complete. Open a new terminal (or restart the Codespace shell) to use zsh."
