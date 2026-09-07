@@ -60,6 +60,25 @@ fi
 
 # --- Symlink dotfiles with GNU Stow ------------------------------------------
 if command -v stow >/dev/null 2>&1; then
+  # The Codespaces base image (or earlier steps, e.g. apt installing zsh)
+  # can create real (non-symlink) files at some of our stow targets, e.g.
+  # ~/.zshrc. Stow refuses to overwrite a real file and aborts stowing
+  # *everything* if even one target conflicts. Force-remove any conflicting
+  # real file/dir at each top-level package entry first so stow can proceed
+  # (no backup: per-repo decision, the dotfiles repo's version always wins).
+  for entry in "$DOTFILES_DIR"/.[!.]* "$DOTFILES_DIR"/*; do
+    [ -e "$entry" ] || continue
+    name="$(basename "$entry")"
+    case "$name" in
+      .git|.gitignore|.stow-local-ignore|README.md|install.sh|.DS_Store) continue ;;
+    esac
+    target="$HOME/$name"
+    if [ -e "$target" ] && [ ! -L "$target" ]; then
+      echo "==> Removing pre-existing $target so it can be replaced by a symlink"
+      rm -rf "$target"
+    fi
+  done
+
   echo "==> Stowing dotfiles into $HOME"
   stow --target="$HOME" --restow . || echo "==> stow reported conflicts; resolve manually with 'stow -v .'"
 else
