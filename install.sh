@@ -7,7 +7,14 @@
 # Installs the tools referenced by these dotfiles (.zshrc, .tmux.conf), sets
 # zsh as the default shell, and symlinks everything into $HOME with GNU Stow.
 # Downloads are verified in-line (sha256) instead of piping curl into a shell.
-set -euo pipefail
+#
+# IMPORTANT: critical steps (stow, default shell, exec-zsh) run first and use
+# 'set +e' locally where needed, so a failure in any single *optional* step
+# below (oh-my-zsh, starship, tpm, Copilot CLI) can never abort the script
+# before the critical steps have run. See postmortem in git history: an
+# earlier version used 'set -e' for the whole script, so a starship
+# checksum-format bug silently skipped stow/shell setup entirely.
+set -uo pipefail
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$DOTFILES_DIR"
@@ -47,64 +54,9 @@ if command -v batcat >/dev/null 2>&1 && ! command -v bat >/dev/null 2>&1; then
   ln -sf "$(command -v batcat)" "$HOME/.local/bin/bat"
 fi
 
-clone_if_missing() {
-  local repo="$1" dest="$2"
-  if [ ! -d "$dest" ]; then
-    echo "==> Cloning $repo -> $dest"
-    git clone --depth=1 "https://github.com/${repo}.git" "$dest"
-  fi
-}
-
-# --- oh-my-zsh + plugins/theme (via git clone, not curl|sh) -----------------
-export ZSH="${ZSH:-$HOME/.oh-my-zsh}"
-export ZSH_CUSTOM="${ZSH_CUSTOM:-$ZSH/custom}"
-
-clone_if_missing "ohmyzsh/ohmyzsh" "$ZSH"
-clone_if_missing "zsh-users/zsh-autosuggestions" "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
-clone_if_missing "zsh-users/zsh-syntax-highlighting" "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
-clone_if_missing "romkatv/powerlevel10k" "$ZSH_CUSTOM/themes/powerlevel10k"
-
-# --- tmux plugin manager (tpm), required by .tmux.conf ----------------------
-clone_if_missing "tmux-plugins/tpm" "$HOME/.tmux/plugins/tpm"
-
-# --- starship prompt (verified download, no curl|sh) ------------------------
-if ! command -v starship >/dev/null 2>&1; then
-  echo "==> Installing starship"
-  ARCH="$(uname -m)"
-  case "$ARCH" in
-    x86_64) STARSHIP_ASSET="starship-x86_64-unknown-linux-gnu.tar.gz" ;;
-    aarch64) STARSHIP_ASSET="starship-aarch64-unknown-linux-musl.tar.gz" ;;
-    *) STARSHIP_ASSET="" ;;
-  esac
-  if [ -n "$STARSHIP_ASSET" ]; then
-    TMP_DIR="$(mktemp -d)"
-    trap 'rm -rf "$TMP_DIR"' EXIT
-    BASE_URL="https://github.com/starship/starship/releases/latest/download"
-    curl -fsSL "$BASE_URL/${STARSHIP_ASSET}" -o "$TMP_DIR/starship.tar.gz"
-    curl -fsSL "$BASE_URL/${STARSHIP_ASSET}.sha256" -o "$TMP_DIR/starship.tar.gz.sha256"
-    (cd "$TMP_DIR" && sha256sum -c starship.tar.gz.sha256)
-    tar -xzf "$TMP_DIR/starship.tar.gz" -C "$TMP_DIR"
-    install -m 0755 "$TMP_DIR/starship" "$HOME/.local/bin/starship"
-    rm -rf "$TMP_DIR"
-    trap - EXIT
-  else
-    echo "==> Unsupported architecture ($ARCH) for starship, skipping."
-  fi
-else
-  echo "==> starship already installed"
-fi
-
-# --- GitHub Copilot CLI ------------------------------------------------------
-if command -v npm >/dev/null 2>&1; then
-  if ! command -v copilot >/dev/null 2>&1; then
-    echo "==> Installing GitHub Copilot CLI (@github/copilot) via npm"
-    npm install -g @github/copilot
-  else
-    echo "==> GitHub Copilot CLI already installed ($(copilot --version 2>/dev/null || echo 'unknown version'))"
-  fi
-else
-  echo "==> npm not found, skipping GitHub Copilot CLI install."
-fi
+# =============================================================================
+# CRITICAL SECTION: must always run, even if something above failed.
+# =============================================================================
 
 # --- Symlink dotfiles with GNU Stow ------------------------------------------
 if command -v stow >/dev/null 2>&1; then
@@ -151,6 +103,80 @@ if [ -n "$ZSH_BIN" ]; then
       echo "# <<< dotfiles: exec zsh for interactive sessions <<<"
     } >> "$BASHRC"
   fi
+fi
+
+# =============================================================================
+# OPTIONAL / NICE-TO-HAVE SECTION: each step is independently fault-tolerant,
+# so one failing (e.g. a GitHub release asset changing format) can't affect
+# the critical section above, which always runs first.
+# =============================================================================
+
+clone_if_missing() {
+  local repo="$1" dest="$2"
+  if [ ! -d "$dest" ]; then
+    echo "==> Cloning $repo -> $dest"
+    git clone --depth=1 "https://github.com/${repo}.git" "$dest" || echo "==> Failed to clone $repo, skipping."
+  fi
+}
+
+# --- oh-my-zsh + plugins/theme (via git clone, not curl|sh) -----------------
+export ZSH="${ZSH:-$HOME/.oh-my-zsh}"
+export ZSH_CUSTOM="${ZSH_CUSTOM:-$ZSH/custom}"
+
+clone_if_missing "ohmyzsh/ohmyzsh" "$ZSH"
+clone_if_missing "zsh-users/zsh-autosuggestions" "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
+clone_if_missing "zsh-users/zsh-syntax-highlighting" "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
+clone_if_missing "romkatv/powerlevel10k" "$ZSH_CUSTOM/themes/powerlevel10k"
+
+# --- tmux plugin manager (tpm), required by .tmux.conf ----------------------
+clone_if_missing "tmux-plugins/tpm" "$HOME/.tmux/plugins/tpm"
+
+# --- starship prompt (verified download, no curl|sh) ------------------------
+install_starship() {
+  command -v starship >/dev/null 2>&1 && { echo "==> starship already installed"; return 0; }
+
+  echo "==> Installing starship"
+  local arch asset base_url tmp_dir
+  arch="$(uname -m)"
+  case "$arch" in
+    x86_64) asset="starship-x86_64-unknown-linux-gnu.tar.gz" ;;
+    aarch64) asset="starship-aarch64-unknown-linux-musl.tar.gz" ;;
+    *) echo "==> Unsupported architecture ($arch) for starship, skipping."; return 0 ;;
+  esac
+
+  tmp_dir="$(mktemp -d)"
+  base_url="https://github.com/starship/starship/releases/latest/download"
+
+  curl -fsSL "$base_url/${asset}" -o "$tmp_dir/starship.tar.gz" || { echo "==> Failed to download starship, skipping."; rm -rf "$tmp_dir"; return 0; }
+  curl -fsSL "$base_url/${asset}.sha256" -o "$tmp_dir/starship.tar.gz.sha256" || { echo "==> Failed to download starship checksum, skipping."; rm -rf "$tmp_dir"; return 0; }
+
+  # starship's .sha256 asset contains only the raw hex digest (no filename),
+  # not the "<hash>  <filename>" line format 'sha256sum -c' requires. Build
+  # that line ourselves instead of feeding the file to sha256sum -c directly.
+  local expected actual
+  expected="$(tr -d '[:space:]' < "$tmp_dir/starship.tar.gz.sha256")"
+  actual="$(sha256sum "$tmp_dir/starship.tar.gz" | awk '{print $1}')"
+  if [ "$expected" != "$actual" ]; then
+    echo "==> starship checksum mismatch (expected $expected, got $actual), skipping install."
+    rm -rf "$tmp_dir"
+    return 0
+  fi
+
+  tar -xzf "$tmp_dir/starship.tar.gz" -C "$tmp_dir" && install -m 0755 "$tmp_dir/starship" "$HOME/.local/bin/starship"
+  rm -rf "$tmp_dir"
+}
+install_starship
+
+# --- GitHub Copilot CLI ------------------------------------------------------
+if command -v npm >/dev/null 2>&1; then
+  if ! command -v copilot >/dev/null 2>&1; then
+    echo "==> Installing GitHub Copilot CLI (@github/copilot) via npm"
+    npm install -g @github/copilot || echo "==> Failed to install GitHub Copilot CLI, skipping."
+  else
+    echo "==> GitHub Copilot CLI already installed ($(copilot --version 2>/dev/null || echo 'unknown version'))"
+  fi
+else
+  echo "==> npm not found, skipping GitHub Copilot CLI install."
 fi
 
 echo "==> Dotfiles bootstrap complete. Open a new terminal (or restart the Codespace shell) to use zsh."
