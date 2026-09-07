@@ -6,7 +6,11 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
 fi
 
 # Homebrew
-eval "$(/opt/homebrew/bin/brew shellenv)"
+if [ -x /opt/homebrew/bin/brew ]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
 
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
@@ -25,7 +29,7 @@ plugins=(git zsh-autosuggestions zsh-syntax-highlighting web-search)
 
 source $ZSH/oh-my-zsh.sh
 
-eval "$(starship init zsh)"
+command -v starship >/dev/null && eval "$(starship init zsh)"
 
 if [[ "$TERM_PROGRAM" == "ghostty" ]]; then
     export TERM=xterm-256color
@@ -37,14 +41,14 @@ export PATH="$PATH:$HOME/Scripts/"
 export NVM_DIR="$HOME/.nvm"
   [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
   [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
-export PATH=$PATH:/Users/elveblest/.spicetify
+[ -d "/Users/elveblest/.spicetify" ] && export PATH=$PATH:/Users/elveblest/.spicetify
 
-[ -f "/Users/elveblest/.ghcup/env" ] && source "/Users/elveblest/.ghcup/env" # ghcup-env
+[ -f "$HOME/.ghcup/env" ] && source "$HOME/.ghcup/env" # ghcup-env
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-eval "$(fzf --zsh)"
+command -v fzf >/dev/null && eval "$(fzf --zsh)"
 
 # -- Use fd instead of fzf --
 
@@ -101,7 +105,7 @@ export BAT_THEME=tokyonight_night
 alias ls="eza --color=always --long --git --no-filesize --icons=always --no-time --no-user --no-permissions"
 
 # ---- Zoxide (better cd) ----
-eval "$(zoxide init zsh)"
+command -v zoxide >/dev/null && eval "$(zoxide init zsh)"
 
 alias cd="z"
 alias vim="nvim"
@@ -110,13 +114,22 @@ if [[ "$(uname)" != "Darwin" ]]; then
 fi
 # source /usr/share/nvm/init-nvm.sh
 
-export PATH=$PATH:$(go env GOPATH)/bin
+export PATH=$PATH:$(command -v go >/dev/null && go env GOPATH)/bin
 
 export XDG_CONFIG_HOME="$HOME/.config"
 
 autoload bashcompinit
 bashcompinit
 # source "${HOME}/.local/share/bash-completion/completions/am"
-source "${HOME}/.env"
+[ -f "${HOME}/.env" ] && source "${HOME}/.env"
 
-. "$HOME/.local/bin/env"
+[ -f "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
+[ -d "/opt/homebrew/opt/libpq/bin" ] && export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
+
+# pnpm
+export PNPM_HOME="${PNPM_HOME:-$HOME/Library/pnpm}"
+case ":$PATH:" in
+  *":$PNPM_HOME/bin:"*) ;;
+  *) export PATH="$PNPM_HOME/bin:$PATH" ;;
+esac
+# pnpm end
