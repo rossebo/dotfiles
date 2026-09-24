@@ -129,6 +129,8 @@ hl.config({
 	},
 	master = {
 		new_status = "master",
+		orientation = "top",
+		mfact = 0.75
 	},
 	misc = {
 		force_default_wallpaper = 0,
