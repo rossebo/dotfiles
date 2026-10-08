@@ -58,3 +58,33 @@ vim.api.nvim_create_autocmd('FileType', {
     vim.opt_local.expandtab = true
   end,
 })
+
+-- Define WoW Class Colors
+vim.api.nvim_set_hl(0, 'WoWPaladin', { fg = '#F58CBA', bold = true })
+vim.api.nvim_set_hl(0, 'WoWDruid',   { fg = '#FF7D0A', bold = true })
+vim.api.nvim_set_hl(0, 'WoWShaman',  { fg = '#0070DE', bold = true })
+vim.api.nvim_set_hl(0, 'WoWPriest',  { fg = '#F0F0F0', bold = true })
+vim.api.nvim_set_hl(0, 'WoWRogue',   { fg = '#FFF468', bold = true })
+vim.api.nvim_set_hl(0, 'WoWWarlock', { fg = '#8788EE', bold = true })
+vim.api.nvim_set_hl(0, 'WoWMage',    { fg = '#3FC7EB', bold = true })
+vim.api.nvim_set_hl(0, 'WoWHunter',  { fg = '#AAD372', bold = true })
+vim.api.nvim_set_hl(0, 'WoWWarrior', { fg = '#C69B6D', bold = true })
+
+-- Automatically highlight class names when opening any Markdown file
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'markdown',
+  callback = function()
+    vim.cmd([[
+      syntax match WoWPaladin /\<Paladin\>/
+      syntax match WoWDruid /\<Druid\>/
+      syntax match WoWShaman /\<Shaman\>/
+      syntax match WoWPriest /\<Priest\>/
+      syntax match WoWRogue /\<Rogue\>/
+      syntax match WoWWarlock /\<Warlock\>/
+      syntax match WoWMage /\<Mage\>/
+      syntax match WoWHunter /\<Hunter\>/
+      syntax match WoWWarrior /\<Warrior\>/
+    ]])
+  end,
+})
+
