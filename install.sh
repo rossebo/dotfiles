@@ -49,7 +49,8 @@ if command -v apt-get >/dev/null 2>&1; then
 
   # Referenced in .zshrc but optional: install what's available in this
   # Ubuntu release and skip the rest instead of failing the whole script.
-  for pkg in fzf bat fd-find eza zoxide; do
+  # ncurses-term ships the xterm-kitty terminfo (needed when SSHing in from Kitty).
+  for pkg in fzf bat fd-find eza zoxide ncurses-term; do
     $SUDO apt-get install -y "$pkg" </dev/null || echo "==> Skipping unavailable apt package: $pkg"
   done
 else

@@ -1,3 +1,10 @@
+# Kitty over SSH (e.g. gh cs ssh into a Codespace): fall back if the remote
+# lacks the xterm-kitty terminfo, otherwise zle/p10k garble input and `clear` fails.
+# Must run before the p10k instant prompt below.
+if [[ "$TERM" == "xterm-kitty" ]] && ! infocmp "$TERM" >/dev/null 2>&1; then
+  export TERM=xterm-256color
+fi
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -109,6 +116,9 @@ command -v zoxide >/dev/null && eval "$(zoxide init zsh)"
 
 alias cd="z"
 alias vim="nvim"
+# SSH into a Codespace and attach to (or create) its tmux session. The TERM
+# fallback runs before tmux, since tmux starts before the remote .zshrc does.
+alias cs='gh cs ssh -- -t "infocmp \$TERM >/dev/null 2>&1 || export TERM=xterm-256color; tmux -u new-session -A -s main"'
 if [[ "$(uname)" != "Darwin" ]]; then
   alias open='xdg-open'
 fi
