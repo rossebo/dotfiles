@@ -8,8 +8,6 @@ Enable in kitty.conf:
     tab_bar_background #403e41
 """
 
-from datetime import datetime
-
 from kitty.fast_data_types import Screen, get_boss
 from kitty.tab_bar import DrawData, ExtraData, TabBarData, as_rgb
 
@@ -21,9 +19,7 @@ ORANGE = as_rgb(0xFC9867)
 ACTIVE_BG = as_rgb(0x5B595C)
 
 LEFT_SEP = ""
-RIGHT_SEP = ""
 ICON = "  "
-TIME_FORMAT = " %H:%M "
 
 
 def _draw_icon(screen: Screen) -> None:
@@ -33,18 +29,6 @@ def _draw_icon(screen: Screen) -> None:
     screen.cursor.bold = False
     screen.cursor.fg, screen.cursor.bg = ORANGE, DARK_GRAY
     screen.draw(LEFT_SEP)
-
-
-def _draw_clock(screen: Screen) -> None:
-    clock = datetime.now().strftime(TIME_FORMAT)
-    width = len(clock) + 1
-    screen.cursor.x = screen.columns - width
-    screen.cursor.fg, screen.cursor.bg = ORANGE, DARK_GRAY
-    screen.draw(RIGHT_SEP)
-    screen.cursor.fg, screen.cursor.bg = BLACK, ORANGE
-    screen.cursor.bold = True
-    screen.draw(clock)
-    screen.cursor.bold = False
 
 
 # Default names by tab position; a manual rename (set_tab_title) always wins
@@ -91,8 +75,5 @@ def draw_tab(
     screen.cursor.fg, screen.cursor.bg = bg, DARK_GRAY
     screen.draw(LEFT_SEP if tab.is_active else " ")
     end = screen.cursor.x
-
-    if is_last:
-        _draw_clock(screen)
 
     return end
