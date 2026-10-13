@@ -12,21 +12,6 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
--- Organize imports on save
--- vim.api.nvim_create_autocmd({ 'BufWritePre' }, {
---   group = vim.api.nvim_create_augroup('ts_imports', { clear = true }),
---   pattern = { '*.tsx,*.ts' },
---   callback = function()
---     vim.lsp.buf.code_action {
---       apply = true,
---       context = {
---         only = { 'source.organizeImports.ts' },
---         diagnostics = {},
---       },
---     }
---   end,
--- })
-
 -- Workaround for setting virtual buffers to type nofile, so we aren't prompted to save changes to them
 -- This is handled by listing and iterating through them one second after startup because the __virtual.cs file is created later as a hidden buffer by the lsp
 -- and cannot be captured by 'BufEnter', 'BufHidden', 'BufNewFile', 'BufRead', 'BufReadPost' or 'BufWinEnter' events
