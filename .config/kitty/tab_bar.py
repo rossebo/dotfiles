@@ -10,8 +10,7 @@ Enable in kitty.conf:
 
 from datetime import datetime
 
-from kitty.boss import get_boss
-from kitty.fast_data_types import Screen
+from kitty.fast_data_types import Screen, get_boss
 from kitty.tab_bar import DrawData, ExtraData, TabBarData, as_rgb
 
 # Monokai Pro palette, same values as tmux-monokai-pro's monokai.sh
@@ -48,28 +47,18 @@ def _draw_clock(screen: Screen) -> None:
     screen.cursor.bold = False
 
 
-def _is_codespace_tab(tab_id: int) -> bool:
-    # Titles get overwritten by tmux/nvim inside the Codespace, so detect the
-    # local `gh cs ssh` foreground process instead
-    tab = get_boss().tab_for_id(tab_id)
-    window = tab.active_window if tab else None
-    if window is None:
-        return False
-    for cmdline in window.child.foreground_processes_cmdlines():
-        names = [arg.rsplit("/", 1)[-1] for arg in cmdline]
-        if "gh" in names and "cs" in names:
-            return True
-    return False
+# Default names by tab position; a manual rename (set_tab_title) always wins
+TAB_NAMES = {1: "local", 2: "codespace", 3: "caffeinate"}
 
 
-def _display_title(tab: TabBarData) -> str:
-    boss_tab = get_boss().tab_for_id(tab.tab_id)
-    # A manual rename (set_tab_title) always wins
-    if boss_tab is not None and boss_tab.name:
-        return tab.title
-    if _is_codespace_tab(tab.tab_id) or tab.title.startswith("codespace@"):
-        return "codespace"
-    return tab.title
+def _display_title(tab: TabBarData, index: int) -> str:
+    try:
+        boss_tab = get_boss().tab_for_id(tab.tab_id)
+        if boss_tab is not None and boss_tab.name:
+            return tab.title
+    except Exception:
+        pass
+    return TAB_NAMES.get(index, tab.title)
 
 
 def draw_tab(
@@ -86,7 +75,7 @@ def draw_tab(
         _draw_icon(screen)
 
     bg = ACTIVE_BG if tab.is_active else DARK_GRAY
-    title = f" {index} {_display_title(tab)} "
+    title = f" {index} {_display_title(tab, index)} "
     # Leave room for the trailing separator
     max_len = max(max_title_length - 1, 1)
     if len(title) > max_len:
