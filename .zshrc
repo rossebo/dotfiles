@@ -118,7 +118,17 @@ alias cd="z"
 alias vim="nvim"
 # SSH into a Codespace and attach to (or create) its tmux session. The TERM
 # fallback runs before tmux, since tmux starts before the remote .zshrc does.
-alias cs='gh cs ssh -- -t "infocmp \$TERM >/dev/null 2>&1 || export TERM=xterm-256color; tmux -u new-session -A -s main"'
+# When the connection dies, tmux never gets to turn off mouse reporting, so the
+# local terminal keeps sending mouse events as escape sequences; reset them after.
+reset_mouse() {
+  printf '\e[?1000l\e[?1002l\e[?1003l\e[?1005l\e[?1006l\e[?1015l\e[?1004l\e[?2004l\e[?25h'
+}
+cs() {
+  gh cs ssh -- -o ServerAliveInterval=15 -o ServerAliveCountMax=3 -t "infocmp \$TERM >/dev/null 2>&1 || export TERM=xterm-256color; tmux -u new-session -A -s main"
+  local rc=$?
+  reset_mouse
+  return $rc
+}
 if [[ "$(uname)" != "Darwin" ]]; then
   alias open='xdg-open'
 fi
