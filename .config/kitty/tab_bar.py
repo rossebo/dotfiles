@@ -47,6 +47,13 @@ def _draw_clock(screen: Screen) -> None:
     screen.cursor.bold = False
 
 
+def _display_title(title: str) -> str:
+    # Auto-generated Codespace ssh titles; manual renames never match
+    if title.startswith("codespace@") or "codespaces-" in title:
+        return "Codespace"
+    return title
+
+
 def draw_tab(
     draw_data: DrawData,
     screen: Screen,
@@ -61,7 +68,7 @@ def draw_tab(
         _draw_icon(screen)
 
     bg = ACTIVE_BG if tab.is_active else DARK_GRAY
-    title = f" {index} {tab.title} "
+    title = f" {index} {_display_title(tab.title)} "
     # Leave room for the trailing separator
     max_len = max(max_title_length - 1, 1)
     if len(title) > max_len:

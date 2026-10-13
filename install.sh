@@ -161,6 +161,8 @@ clone_if_missing "romkatv/powerlevel10k" "$ZSH_CUSTOM/themes/powerlevel10k"
 
 # --- tmux plugin manager (tpm), required by .tmux.conf ----------------------
 clone_if_missing "tmux-plugins/tpm" "$HOME/.tmux/plugins/tpm"
+# Install the plugins listed in .tmux.conf without needing prefix + I
+"$HOME/.tmux/plugins/tpm/bin/install_plugins" || echo "==> tpm plugin install failed (run prefix + I in tmux)"
 
 # --- starship prompt (verified download, no curl|sh) ------------------------
 install_starship() {
