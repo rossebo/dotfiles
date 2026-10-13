@@ -28,6 +28,9 @@ Add this to .gitconfig
 `install.sh` installs `ncurses-term` (provides the `xterm-kitty` terminfo), and `.zshrc`
 falls back to `TERM=xterm-256color` if it's still missing, so input/`clear` don't break.
 
+Kitty always opens three tabs on start (`.config/kitty/startup.conf`): local, codespace
+(`gh codespace ssh`) and caffeinate. Switch with `cmd+1/2/3` or `cmd+shift+[` / `]`.
+
 Workflow: one Kitty tab for the Codespace, other tabs for local work (no nested tmux).
 In the Codespace tab run `cs`, which SSHes in and attaches to a persistent tmux session
 (`main`), creating it if needed. tmux runs only inside the Codespace, with the usual `C-q` prefix.
