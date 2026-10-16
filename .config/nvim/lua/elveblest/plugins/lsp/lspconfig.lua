@@ -114,6 +114,20 @@ return {
           filetypes = { 'html', 'typescriptreact', 'javascriptreact', 'css', 'sass', 'scss', 'less', 'svelte' },
         }
       end,
+      ['pylsp'] = function()
+        -- flake8/pycodestyle default to 79 columns (E501); use 88 to match black
+        lspconfig['pylsp'].setup {
+          capabilities = capabilities,
+          settings = {
+            pylsp = {
+              plugins = {
+                pycodestyle = { maxLineLength = 88 },
+                flake8 = { maxLineLength = 88 },
+              },
+            },
+          },
+        }
+      end,
       ['lua_ls'] = function()
         -- configure lua server (with special settings)
         lspconfig['lua_ls'].setup {
