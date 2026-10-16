@@ -82,7 +82,7 @@ if command -v stow >/dev/null 2>&1; then
     [ -e "$entry" ] || continue
     name="$(basename "$entry")"
     case "$name" in
-      .git|.gitignore|.stow-local-ignore|README.md|install.sh|.DS_Store) continue ;;
+      .git|.gitignore|.stow-local-ignore|README.md|install.sh|.DS_Store|skills) continue ;;
     esac
     target="$HOME/$name"
     if [ -e "$target" ] && [ ! -L "$target" ]; then
@@ -95,6 +95,20 @@ if command -v stow >/dev/null 2>&1; then
   stow --target="$HOME" --restow . || echo "==> stow reported conflicts; resolve manually with 'stow -v .'"
 else
   echo "==> GNU Stow not found, skipping symlink step."
+fi
+
+# --- Link agent skills for GitHub Copilot CLI --------------------------------
+# Skills live in $DOTFILES_DIR/skills/<name>/SKILL.md. They are linked one by
+# one into ~/.copilot/skills instead of stowed, because ~/.copilot also holds
+# Copilot's own state/auth and must stay a real directory (stow would fold it
+# into a symlink to this repo, and the cleanup loop above would delete it).
+if [ -d "$DOTFILES_DIR/skills" ]; then
+  mkdir -p "$HOME/.copilot/skills"
+  for skill in "$DOTFILES_DIR"/skills/*/; do
+    [ -f "${skill}SKILL.md" ] || continue
+    ln -sfn "${skill%/}" "$HOME/.copilot/skills/$(basename "$skill")"
+    echo "==> Linked skill $(basename "$skill")"
+  done
 fi
 
 # --- Set zsh as the default shell -------------------------------------------
