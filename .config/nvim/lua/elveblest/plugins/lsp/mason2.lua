@@ -200,6 +200,7 @@ return { -- LSP Configuration & Plugins
       'stylua', -- Used to format Lua code
       'black', -- Python formatter
       'isort', -- Python import sorter
+      'tree-sitter-cli', -- Needed by nvim-treesitter to compile parsers
     })
     require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 

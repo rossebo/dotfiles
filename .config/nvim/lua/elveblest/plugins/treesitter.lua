@@ -9,7 +9,19 @@ return {
   config = function()
     local ts = require 'nvim-treesitter'
     local parsers = { 'python', 'lua', 'c_sharp', 'bash', 'json', 'yaml', 'toml', 'markdown', 'markdown_inline' }
-    ts.install(parsers)
+
+    -- The tree-sitter CLI comes from Mason (async), so wait for it if missing
+    if vim.fn.executable 'tree-sitter' == 1 then
+      ts.install(parsers)
+    else
+      vim.api.nvim_create_autocmd('User', {
+        pattern = 'MasonToolsComplete',
+        once = true,
+        callback = function()
+          ts.install(parsers)
+        end,
+      })
+    end
 
     vim.api.nvim_create_autocmd('FileType', {
       group = vim.api.nvim_create_augroup('elveblest-treesitter', { clear = true }),
