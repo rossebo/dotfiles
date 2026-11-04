@@ -228,6 +228,17 @@ hl.window_rule({
 	immediate = true,
 })
 
+hl.window_rule({
+	name = "transport-fever",
+	match = { class = "^TransportFever3$" },
+	workspace = "4",
+	opaque = true,
+	no_blur = true,
+	no_shadow = true,
+	border_size = 0,
+	immediate = true,
+})
+
 -- 4. Error & Popup Handling
 hl.window_rule({
 	name = "wow-voice-proxy",
