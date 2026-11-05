@@ -1,33 +1,31 @@
-return {
-  'stevearc/conform.nvim',
-  event = { 'BufReadPre', 'BufNewFile' },
-  config = function()
-    local conform = require 'conform'
+local web = { "oxfmt", "prettierd", "prettier", stop_after_first = true }
 
-    conform.setup {
-      formatters_by_ft = {
-        javascript = { 'prettier' },
-        typescript = { 'prettier' },
-        javascriptreact = { 'prettier' },
-        typescriptreact = { 'prettier' },
-        svelte = { 'prettier' },
-        css = { 'prettier' },
-        html = { 'prettier' },
-        json = { 'prettier' },
-        yaml = { 'prettier' },
-        markdown = { 'prettier' },
-        graphql = { 'prettier' },
-        lua = { 'stylua' },
-        python = { 'isort', 'black' },
-      },
-      format_on_save = false,
-    }
-    vim.keymap.set({ 'n', 'v' }, '<leader>mp', function()
-      conform.format {
-        lsp_fallback = true,
-        async = false,
-        timeout_ms = 500,
-      }
-    end, { desc = 'Format file or range (in visual mode)' })
-  end,
-}
+require("conform").setup({
+	formatters_by_ft = {
+		javascript = web,
+		typescript = web,
+		javascriptreact = web,
+		typescriptreact = web,
+		json = web,
+		css = web,
+		scss = web,
+		less = web,
+		html = web,
+		markdown = web,
+		mdx = web,
+		yaml = web,
+		lua = { "stylua" },
+		sh = { "shfmt" },
+		fish = { "fish_indent" },
+	},
+	formatters = {
+		-- Only runs when the project has an oxfmt config (.oxfmtrc.json, vite.config.ts, ...)
+		oxfmt = { require_cwd = true },
+	},
+	format_on_save = function(bufnr)
+		if vim.b[bufnr].disable_autoformat then
+			return
+		end
+		return { timeout_ms = 1000, lsp_format = "fallback" }
+	end,
+})

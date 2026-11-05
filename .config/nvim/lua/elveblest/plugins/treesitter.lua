@@ -1,36 +1,62 @@
--- Neovim ships the tree-sitter client; nvim-treesitter (main branch) is only
--- used to install/update parsers and provide queries. Needs the `tree-sitter`
--- CLI and a C compiler on PATH.
-return {
-  'nvim-treesitter/nvim-treesitter',
-  branch = 'main',
-  lazy = false,
-  build = ':TSUpdate',
-  config = function()
-    local ts = require 'nvim-treesitter'
-    local parsers = { 'python', 'lua', 'c_sharp', 'bash', 'json', 'yaml', 'toml', 'markdown', 'markdown_inline' }
-
-    -- The tree-sitter CLI comes from Mason (async), so wait for it if missing
-    if vim.fn.executable 'tree-sitter' == 1 then
-      ts.install(parsers)
-    else
-      vim.api.nvim_create_autocmd('User', {
-        pattern = 'MasonToolsComplete',
-        once = true,
-        callback = function()
-          ts.install(parsers)
-        end,
-      })
-    end
-
-    vim.api.nvim_create_autocmd('FileType', {
-      group = vim.api.nvim_create_augroup('elveblest-treesitter', { clear = true }),
-      callback = function(args)
-        -- Silently skip filetypes without an installed parser
-        if pcall(vim.treesitter.start, args.buf) then
-          vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
-        end
-      end,
-    })
-  end,
+local parsers = {
+	"astro",
+	"bash",
+	"c",
+	"cmake",
+	"cpp",
+	"css",
+	"diff",
+	"fish",
+	"gitignore",
+	"go",
+	"graphql",
+	"html",
+	"http",
+	"java",
+	"javascript",
+	"jsdoc",
+	"json",
+	"lua",
+	"luadoc",
+	"luap",
+	"markdown",
+	"markdown_inline",
+	"php",
+	"printf",
+	"python",
+	"query",
+	"regex",
+	"rust",
+	"scss",
+	"sql",
+	"svelte",
+	"toml",
+	"tsx",
+	"typescript",
+	"vim",
+	"vimdoc",
+	"xml",
+	"yaml",
 }
+
+local treesitter = require("nvim-treesitter")
+treesitter.setup()
+
+local installed = treesitter.get_installed()
+local missing = vim.tbl_filter(function(lang)
+	return not vim.list_contains(installed, lang)
+end, parsers)
+if #missing > 0 then
+	treesitter.install(missing)
+end
+
+vim.api.nvim_create_autocmd("FileType", {
+	group = vim.api.nvim_create_augroup("elveblest-treesitter", { clear = true }),
+	desc = "Start Treesitter highlighting and indent when a parser exists",
+	callback = function(event)
+		local lang = vim.treesitter.language.get_lang(event.match)
+		if lang and pcall(vim.treesitter.start, event.buf, lang) then
+			vim.bo[event.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+		end
+	end,
+})

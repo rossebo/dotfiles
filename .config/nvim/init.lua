@@ -1,4 +1,11 @@
-require 'elveblest.core'
-require 'elveblest.lazy'
--- The line beneath this is called `modeline`. See `:help modeline`
--- vim: ts=2 sts=2 sw=2 et
+vim.loader.enable()
+
+Elveblest = require("elveblest.utils")
+
+require("elveblest.config.options")
+require("elveblest.config.keymaps")
+require("elveblest.config.autocmds")
+require("elveblest.config.commands")
+require("elveblest.config.workarounds")
+
+require("elveblest.plugins")
