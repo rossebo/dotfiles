@@ -1,0 +1,13 @@
+gui:
+  mouseEvents: false
+git:
+  autoFetch: false
+  paging:
+    colorArg: always
+    pager: delta --dark --paging=never --syntax-theme="Solarized (dark)"
+customCommands:
+  - key: C
+    context: files
+    description: Commit with commitizen
+    command: git cz
+    output: terminal

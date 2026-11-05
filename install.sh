@@ -216,7 +216,7 @@ install_starship() {
 }
 install_starship
 
-# --- Neovim tooling (nvim >= 0.12, lazygit, tree-sitter CLI) ----------------
+# --- Neovim tooling (nvim >= 0.12, lazygit, delta, tree-sitter CLI) ----------------
 # nvim config uses vim.pack (needs 0.12+), snacks.lazygit, and nvim-treesitter
 # (main branch) which compiles parsers with the tree-sitter CLI. Downloads are
 # verified against the sha256 digest GitHub publishes for each release asset.
@@ -249,10 +249,10 @@ install_neovim_tools() {
     return 0
   fi
 
-  local nvim_asset lazygit_re ts_asset
+  local nvim_asset lazygit_re delta_re ts_asset
   case "$(uname -m)" in
-    x86_64) nvim_asset="^nvim-linux-x86_64\\.tar\\.gz$"; lazygit_re="_linux_x86_64\\.tar\\.gz$"; ts_asset="^tree-sitter-linux-x64\\.gz$" ;;
-    aarch64) nvim_asset="^nvim-linux-arm64\\.tar\\.gz$"; lazygit_re="_linux_arm64\\.tar\\.gz$"; ts_asset="^tree-sitter-linux-arm64\\.gz$" ;;
+    x86_64) nvim_asset="^nvim-linux-x86_64\\.tar\\.gz$"; lazygit_re="_linux_x86_64\\.tar\\.gz$"; delta_re="^delta-.*-x86_64-unknown-linux-gnu\\.tar\\.gz$"; ts_asset="^tree-sitter-linux-x64\\.gz$" ;;
+    aarch64) nvim_asset="^nvim-linux-arm64\\.tar\\.gz$"; lazygit_re="_linux_arm64\\.tar\\.gz$"; delta_re="^delta-.*-aarch64-unknown-linux-gnu\\.tar\\.gz$"; ts_asset="^tree-sitter-linux-arm64\\.gz$" ;;
     *) echo "==> Unsupported architecture ($(uname -m)) for nvim tooling, skipping."; return 0 ;;
   esac
 
@@ -287,6 +287,19 @@ install_neovim_tools() {
     fi
   fi
 
+  # delta renders lazygit diffs (see .config/lazygit/config.yml).
+  if command -v delta >/dev/null 2>&1; then
+    echo "==> delta already installed"
+  else
+    echo "==> Installing delta"
+    if file="$(gh_release_download dandavison/delta "$delta_re" "$tmp_dir")"; then
+      tar -xzf "$file" -C "$tmp_dir" --strip-components=1 --wildcards '*/delta' && install -m 0755 "$tmp_dir/delta" "$HOME/.local/bin/delta" \
+        || echo "==> Failed to install delta, skipping."
+    else
+      echo "==> Failed to download delta, skipping."
+    fi
+  fi
+
   if command -v tree-sitter >/dev/null 2>&1; then
     echo "==> tree-sitter CLI already installed"
   else
@@ -313,6 +326,19 @@ if command -v npm >/dev/null 2>&1; then
   fi
 else
   echo "==> npm not found, skipping GitHub Copilot CLI install."
+fi
+
+# --- commitizen (git cz, used by lazygit's C key) ----------------------------
+# The adapter is configured in ~/.czrc (stowed from .czrc).
+if command -v npm >/dev/null 2>&1; then
+  if ! command -v git-cz >/dev/null 2>&1; then
+    echo "==> Installing commitizen via npm"
+    npm install -g commitizen cz-conventional-changelog </dev/null || echo "==> Failed to install commitizen, skipping."
+  else
+    echo "==> commitizen already installed"
+  fi
+else
+  echo "==> npm not found, skipping commitizen install."
 fi
 
 echo "==> Dotfiles bootstrap complete. Open a new terminal (or restart the Codespace shell) to use zsh."
