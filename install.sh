@@ -50,7 +50,9 @@ if command -v apt-get >/dev/null 2>&1; then
   # Referenced in .zshrc but optional: install what's available in this
   # Ubuntu release and skip the rest instead of failing the whole script.
   # ncurses-term ships the xterm-kitty terminfo (needed when SSHing in from Kitty).
-  for pkg in fzf bat fd-find eza zoxide ncurses-term; do
+  # ripgrep powers nvim's live grep; build-essential (C compiler) is needed by
+  # the tree-sitter CLI to compile nvim-treesitter parsers.
+  for pkg in fzf bat fd-find eza zoxide ncurses-term ripgrep build-essential; do
     $SUDO apt-get install -y "$pkg" </dev/null || echo "==> Skipping unavailable apt package: $pkg"
   done
 else
