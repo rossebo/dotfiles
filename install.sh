@@ -45,7 +45,7 @@ if command -v apt-get >/dev/null 2>&1; then
   $SUDO apt-get update -y </dev/null
 
   # Required by these dotfiles / this script.
-  $SUDO apt-get install -y zsh git curl ca-certificates stow tmux </dev/null
+  $SUDO apt-get install -y zsh git curl ca-certificates stow tmux jq </dev/null
 
   # Referenced in .zshrc but optional: install what's available in this
   # Ubuntu release and skip the rest instead of failing the whole script.
@@ -213,6 +213,93 @@ install_starship() {
   rm -rf "$tmp_dir"
 }
 install_starship
+
+# --- Neovim tooling (nvim >= 0.12, lazygit, tree-sitter CLI) ----------------
+# nvim config uses vim.pack (needs 0.12+), snacks.lazygit, and nvim-treesitter
+# (main branch) which compiles parsers with the tree-sitter CLI. Downloads are
+# verified against the sha256 digest GitHub publishes for each release asset.
+
+# Prints "<download_url> <sha256>" for the first asset of the latest release
+# of $1 whose name matches the jq regex $2.
+gh_release_asset() {
+  # Authenticate when a token is available; unauthenticated API calls get rate limited (403).
+  curl -fsSL ${GITHUB_TOKEN:+-H "Authorization: Bearer $GITHUB_TOKEN"} "https://api.github.com/repos/$1/releases/latest" \
+    | jq -r --arg re "$2" '[.assets[] | select(.name | test($re))][0] | "\(.browser_download_url) \(.digest | sub("^sha256:"; ""))"'
+}
+
+# Downloads asset $2 (jq regex) of repo $1 into $3 and verifies its checksum.
+# Echoes the downloaded file path.
+gh_release_download() {
+  local info url expected
+  info="$(gh_release_asset "$1" "$2")" || return 1
+  url="${info% *}"
+  expected="${info##* }"
+  case "$url" in https://*) ;; *) return 1 ;; esac
+  [ -n "$expected" ] || return 1
+  curl -fsSL "$url" -o "$3/$(basename "$url")" || return 1
+  [ "$(sha256sum "$3/$(basename "$url")" | awk '{print $1}')" = "$expected" ] || { echo "==> checksum mismatch for $url" >&2; return 1; }
+  echo "$3/$(basename "$url")"
+}
+
+install_neovim_tools() {
+  if ! command -v jq >/dev/null 2>&1; then
+    echo "==> jq not found, skipping nvim/lazygit/tree-sitter install."
+    return 0
+  fi
+
+  local nvim_asset lazygit_re ts_asset
+  case "$(uname -m)" in
+    x86_64) nvim_asset="^nvim-linux-x86_64\\.tar\\.gz$"; lazygit_re="_linux_x86_64\\.tar\\.gz$"; ts_asset="^tree-sitter-linux-x64\\.gz$" ;;
+    aarch64) nvim_asset="^nvim-linux-arm64\\.tar\\.gz$"; lazygit_re="_linux_arm64\\.tar\\.gz$"; ts_asset="^tree-sitter-linux-arm64\\.gz$" ;;
+    *) echo "==> Unsupported architecture ($(uname -m)) for nvim tooling, skipping."; return 0 ;;
+  esac
+
+  local tmp_dir file
+  tmp_dir="$(mktemp -d)"
+
+  local nvim_minor=""
+  command -v nvim >/dev/null 2>&1 && nvim_minor="$(nvim --version | sed -n '1s/^NVIM v0\.\([0-9]*\).*/\1/p')"
+  if [ -n "$nvim_minor" ] && [ "$nvim_minor" -ge 12 ]; then
+    echo "==> nvim already installed ($(nvim --version | head -1))"
+  else
+    echo "==> Installing neovim"
+    if file="$(gh_release_download neovim/neovim "$nvim_asset" "$tmp_dir")"; then
+      rm -rf "$HOME/.local/nvim" && mkdir -p "$HOME/.local/nvim" \
+        && tar -xzf "$file" -C "$HOME/.local/nvim" --strip-components=1 \
+        && ln -sf "$HOME/.local/nvim/bin/nvim" "$HOME/.local/bin/nvim" \
+        || echo "==> Failed to install neovim, skipping."
+    else
+      echo "==> Failed to download neovim, skipping."
+    fi
+  fi
+
+  if command -v lazygit >/dev/null 2>&1; then
+    echo "==> lazygit already installed"
+  else
+    echo "==> Installing lazygit"
+    if file="$(gh_release_download jesseduffield/lazygit "$lazygit_re" "$tmp_dir")"; then
+      tar -xzf "$file" -C "$tmp_dir" lazygit && install -m 0755 "$tmp_dir/lazygit" "$HOME/.local/bin/lazygit" \
+        || echo "==> Failed to install lazygit, skipping."
+    else
+      echo "==> Failed to download lazygit, skipping."
+    fi
+  fi
+
+  if command -v tree-sitter >/dev/null 2>&1; then
+    echo "==> tree-sitter CLI already installed"
+  else
+    echo "==> Installing tree-sitter CLI"
+    if file="$(gh_release_download tree-sitter/tree-sitter "$ts_asset" "$tmp_dir")"; then
+      gunzip -c "$file" > "$tmp_dir/tree-sitter" && install -m 0755 "$tmp_dir/tree-sitter" "$HOME/.local/bin/tree-sitter" \
+        || echo "==> Failed to install tree-sitter CLI, skipping."
+    else
+      echo "==> Failed to download tree-sitter CLI, skipping."
+    fi
+  fi
+
+  rm -rf "$tmp_dir"
+}
+install_neovim_tools
 
 # --- GitHub Copilot CLI ------------------------------------------------------
 if command -v npm >/dev/null 2>&1; then
