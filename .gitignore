@@ -6,3 +6,7 @@ spell/
 lazy-lock.json
 .DS_Store
 nvim-pack-lock.json
+
+Code/
+github-copilot/
+go/

@@ -1,4 +1,4 @@
-local web = { "oxfmt", "prettierd", "prettier", stop_after_first = true }
+local web = { "biome-check", "oxfmt", "prettierd", "prettier", stop_after_first = true }
 
 require("conform").setup({
 	formatters_by_ft = {
@@ -19,6 +19,8 @@ require("conform").setup({
 		fish = { "fish_indent" },
 	},
 	formatters = {
+		-- Only runs when the project has biome config (biome.json)
+		["biome-check"] = { require_cwd = true },
 		-- Only runs when the project has an oxfmt config (.oxfmtrc.json, vite.config.ts, ...)
 		oxfmt = { require_cwd = true },
 	},
