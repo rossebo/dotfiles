@@ -46,12 +46,6 @@ vim.api.nvim_create_autocmd("FileType", {
 	end,
 })
 
--- mini.pairs: toggle auto pairs on and off
-map("n", "<leader>tp", function()
-	vim.g.minipairs_disable = not vim.g.minipairs_disable
-	vim.notify("Auto pairs " .. (vim.g.minipairs_disable and "disabled" or "enabled"))
-end, { desc = "Toggle auto pairs" })
-
 -- LSP
 map("n", "gd", function()
 	Snacks.picker.lsp_definitions()
