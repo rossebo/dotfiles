@@ -27,6 +27,7 @@ vim.pack.add({
 	"https://github.com/nvim-lualine/lualine.nvim",
 	"https://github.com/b0o/incline.nvim",
 	"https://github.com/folke/snacks.nvim",
+	"https://github.com/folke/which-key.nvim",
 	"https://github.com/stevearc/oil.nvim",
 	{ src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "main" },
 	"https://github.com/folke/todo-comments.nvim",

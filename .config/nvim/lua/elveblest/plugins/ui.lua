@@ -59,3 +59,17 @@ require("incline").setup({
 require("tiny-cmdline").setup({
 	position = { x = "50%", y = "20%" },
 })
+
+require("which-key").setup({
+	preset = "helix",
+	icons = { mappings = false },
+})
+require("which-key").add({
+	{ "<leader>b", group = "Buffer" },
+	{ "<leader>c", group = "Code", mode = { "n", "v" } },
+	{ "<leader>d", group = "Diff / delete", mode = { "n", "v" } },
+	{ "<leader>g", group = "Git", mode = { "n", "v" } },
+	{ "<leader>s", group = "Search" },
+	{ "<leader>t", group = "Toggle" },
+	{ "<leader>y", group = "Yank path" },
+})
