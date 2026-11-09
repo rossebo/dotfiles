@@ -68,7 +68,7 @@ require("which-key").add({
 	{ "<leader>b", group = "Buffer" },
 	{ "<leader>c", group = "Code", mode = { "n", "v" } },
 	{ "<leader>d", group = "Diff / delete", mode = { "n", "v" } },
-	{ "<leader>g", group = "Git", mode = { "n", "v" } },
+	{ "<leader>h", group = "Git", mode = { "n", "v" } },
 	{ "<leader>s", group = "Search" },
 	{ "<leader>t", group = "Toggle" },
 	{ "<leader>y", group = "Yank path" },
